@@ -4,10 +4,9 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="FORWARD GoogleMap Unit Development">
+  <meta name="description" content="SD Flights Tracker">
   <meta name="author" content="Moojin Chae">
-
-  <title>San Diego Airport</title>
+  <title>SD Flights Tracker</title>
 
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
@@ -15,22 +14,13 @@
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBTtLxO68T3Enh5wodnVIy0CcnhVH3fWys
                           &libraries=visualization&callback=initMap">
   </script>
-
   <style>
-    .main {
-      padding: 40px 15px;
-      text-align: center;
-    }
-    #map {
-      height: 420px;
-    }
-
-    .right {
-      width: 100%;
-      text-align: right;
-    }
+    .main   {padding: 45px 15px; text-align: center;}
+    .center {width: 100%; text-align: center;}
+    .right  {width: 100%; text-align: right;}
+    .left   {width: 100%; text-align: left;}
+    #map    {margin:10px 0; height: 420px;}
   </style>
-
 </head>
 
 <body>
@@ -43,7 +33,7 @@
           <span class="icon-bar"></span>
           <span class="icon-bar"></span>
         </button>
-        <a class="navbar-brand" href="#">San Diego Airplane</a>
+        <a class="navbar-brand" href="#">SD Flights Tracker</a>
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
@@ -56,10 +46,10 @@
   <div class="container">
 
     <div class="main">
-      <h1>SD Airport Real-time Airplane</h1>
-      <p class="lead">by Moojin Chae</p>
-      <div class="right"><button id="refresh" type="button" class="btn btn-primary">Refresh</button></div>
+      <h1>San Diego Airport Real-time Flights Tracker</h1>
+      <div class="center"><button id="refresh" type="button" class="btn btn-primary">Refresh</button></div>
       <div id="map"></div>
+      <p class="right">by Moojin</p>
     </div>
   </div>
 </body>
@@ -73,32 +63,33 @@
   var iter = 0;
   var maxIter = 100;
   var interval = 1000;
-  var dynamicPlaneCnt = 16;
-  var center = {lat: 32.73, lng:-117.15};
+  var dynamicFlightCnt = 16;
+  var center = {lat: 32.73, lng:-117.15}; // San Diego Airport
   var center1 = {lat: center.lat, lng: center.lng - 0.15};
   var center2 = {lat: center.lat, lng: center.lng + 0.15};
-  var staticPosition = [{lat: center.lat - 0.02, lng: center.lng + 0.14},
-                        {lat: center.lat - 0.08, lng: center.lng - 0.12},
-                        {lat: center.lat + 0.07, lng: center.lng + 0.09},
-                        {lat: center.lat + 0.03, lng: center.lng + 0.15},
-                        {lat: center.lat - 0.07, lng: center.lng - 0.10},
-                        {lat: center.lat + 0.03, lng: center.lng + 0.13},
-                        {lat: center.lat - 0.02, lng: center.lng - 0.18},
-                        {lat: center.lat + 0.07, lng: center.lng - 0.09},
-                        {lat: center.lat + 0.07, lng: center.lng - 0.20},
-                        {lat: center.lat + 0.07, lng: center.lng + 0.21},
-                        {lat: center.lat + 0.04, lng: center.lng - 0.23},
-                        {lat: center.lat + 0.07, lng: center.lng - 0.23},
-                        {lat: center.lat + 0.02, lng: center.lng + 0.27},
-                        {lat: center.lat - 0.08, lng: center.lng - 0.28}];
+  var staticPositions = [{lat: center.lat - 0.02, lng: center.lng + 0.14},
+                         {lat: center.lat - 0.08, lng: center.lng - 0.12},
+                         {lat: center.lat + 0.07, lng: center.lng + 0.09},
+                         {lat: center.lat + 0.03, lng: center.lng + 0.15},
+                         {lat: center.lat - 0.07, lng: center.lng - 0.10},
+                         {lat: center.lat + 0.03, lng: center.lng + 0.13},
+                         {lat: center.lat - 0.02, lng: center.lng - 0.18},
+                         {lat: center.lat + 0.07, lng: center.lng - 0.09},
+                         {lat: center.lat + 0.07, lng: center.lng - 0.20},
+                         {lat: center.lat + 0.07, lng: center.lng + 0.21},
+                         {lat: center.lat + 0.04, lng: center.lng - 0.23},
+                         {lat: center.lat + 0.07, lng: center.lng - 0.23},
+                         {lat: center.lat + 0.02, lng: center.lng + 0.27},
+                         {lat: center.lat - 0.08, lng: center.lng - 0.28}];
 
+  //initialize Google Map and flights' init position.
   function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
       center: center,
       zoom: 11
     });
 
-    for (i = 0; i < dynamicPlaneCnt/2; i++) {
+    for (i = 0; i < dynamicFlightCnt/2; i++) {
       marker = new google.maps.Marker({
         position: center1,
         map: map,
@@ -115,27 +106,20 @@
       markers.push(marker);
     }
     
-    for (i = 0; i < staticPosition.length; i++) {
+    for (i = 0; i < staticPositions.length; i++) {
       marker = new google.maps.Marker({
-        position: {lat: staticPosition[i].lat , lng: staticPosition[i].lng},
+        position: {lat: staticPositions[i].lat , lng: staticPositions[i].lng},
         map: map,
         icon: image,
         id: i+1
       });
     }
+
+    setLatLng();
   }
 
-  $(document).ready(function () {
-    setLatLng();
-    setInterval(updatePosition, interval);
-  });
-
-  $('#refresh').click(function() {
-    updatePosition();
-  });
-
   function setLatLng() {
-    for(i = 0; i < dynamicPlaneCnt/2; i++) {
+    for(i = 0; i < dynamicFlightCnt/2; i++) {
       pos = [];
       alpha = 0.003 * Math.pow(-1, i);
       if (i > 1) beta = alpha;
@@ -159,11 +143,20 @@
     }
   }
 
+  // real-tiem update
+  $(document).ready(function () {
+    setInterval(updatePosition, interval);
+  });
+
+  $('#refresh').click(function() {
+    updatePosition();
+  });
+
   function updatePosition() {
     if (iter < maxIter-1) iter++;
     else iter = 0;
 
-    for (i = 0; i < dynamicPlaneCnt; i++) {
+    for (i = 0; i < dynamicFlightCnt; i++) {
       markers[i].setPosition(new google.maps.LatLng(position[i][iter].lat, position[i][iter].lng));
     }
   }
